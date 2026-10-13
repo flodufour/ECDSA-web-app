@@ -2,6 +2,7 @@ import server from "./server";
 import { toHex, hexToBytes } from "ethereum-cryptography/utils";
 import { useState } from "react";
 import * as secp from "ethereum-cryptography/secp256k1";
+import { keccak256 } from "ethereum-cryptography/keccak";
 
 function Wallet({ address, setAddress, balance, setBalance }) {
   const [privateKey, setPrivateKey] = useState("");
@@ -14,11 +15,12 @@ function Wallet({ address, setAddress, balance, setBalance }) {
       setAddress("");
       setBalance(0);
       return;
-   }
+    }
 
     const privateKey = hexToBytes(value);
     const publicKey = secp.getPublicKey(privateKey);
-    const publicAddress = toHex(publicKey);
+    const hash = keccak256(publicKey.slice(1));
+    const publicAddress = "0x" + toHex(hash.slice(-20));
 
     setAddress(publicAddress);
     if (publicAddress) {
